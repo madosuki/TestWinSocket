@@ -34,9 +34,9 @@ int main()
         }
     }
 
-    SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+    SOCKET server_sock = socket(AF_INET, SOCK_STREAM, 0);
 
-    if(sock == INVALID_SOCKET) {
+    if(server_sock == INVALID_SOCKET) {
         printf("socket create failed\n");
         return -1;
     }
@@ -47,17 +47,17 @@ int main()
     addr.sin_addr.S_un.S_addr = INADDR_ANY;
 
     int optval = 1;
-    // setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&optval, sizeof(optval));
+    setsockopt(server_sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&optval, sizeof(optval));
 
-    bind(sock, (struct sockaddr*)&addr, sizeof(addr));
+    bind(server_sock, (struct sockaddr*)&addr, sizeof(addr));
 
-    listen(sock, 5);
+    listen(server_sock, 5);
 
     struct sockaddr_in client;
 
     while (true) {
         int client_length = sizeof(client);
-        SOCKET negotiator = accept(sock, (struct sockaddr*)&client, &client_length);
+        SOCKET negotiator = accept(server_sock, (struct sockaddr*)&client, &client_length);
 
         char buf[2048];
         memset(buf, 0, sizeof(buf));
@@ -72,7 +72,7 @@ int main()
         closesocket(negotiator);
     }
 
-    closesocket(sock);
+    closesocket(server_sock);
 
     WSACleanup();
 
